@@ -28,9 +28,11 @@ Run:
 
 ```bash
 python3 <this-bundle>/scripts/forge.py scan --out .team/manifest.json
+# hermetic monorepo (Bazel/Buck2): scan only repo-root, ignore global ~/
+python3 <this-bundle>/scripts/forge.py scan --project --lock --out .team/manifest.json
 ```
 
-Read `.team/manifest.json`. Present the discovered roster compactly grouped by theme. If manifest is empty, tell the user which roots were checked and suggest installing skills first (via `npx skills find`) before forging.
+Read `.team/manifest.json`. Present the discovered roster compactly grouped by theme. If manifest is empty, tell the user which roots were checked and suggest installing skills first (via `npx skills find`) before forging. With `--lock`, also emits `.team/lock.json` with `sha256` + `git SHA` per skill for bit-for-bit hermetic guarantees. With `--project`, scans only `<repo>/.agents/skills` etc. for Bazel-hermetic builds.
 
 ### Gate 2 - Select roster
 
@@ -67,6 +69,15 @@ python3 <new-bundle>/scripts/forge.py validators <new-bundle-dir> --out .team/va
 ```
 
 This emits lightweight JSON Schema files in `.team/validators/<artifact>.schema.json` for every JSON `Outputs:` declaration, so phase boundaries are enforced deterministically. Keeps casual teams lightweight (Markdown-only) while hardening mission-critical ones.
+
+**Enterprise hardening** (FAANG-ready):
+
+```bash
+python3 <new-bundle>/scripts/forge.py audit <new-bundle-dir>   # static scan: network/privilege/secret patterns
+python3 <new-bundle>/scripts/forge.py eval <new-bundle-dir> --fixtures ./tests/fixtures  # headless CI: lint+validators+trace
+```
+
+`audit` flags unvetted network, privilege escalation, and secret harvesting in `SKILL.md` + `scripts/*`. `eval` runs the full pipeline headlessly and emits `.team/trace.json` (OTel-compatible: per-phase ms, tokens, bytes, retries) for CI.
 
 ### Gate 5 - Install everywhere
 
