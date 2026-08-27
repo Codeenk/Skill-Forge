@@ -1,16 +1,43 @@
-# Skill-Forge
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Codeenk/Skill-Forge/main/.github/assets/logo.svg" width="80" onerror="this.style.display='none'"/>
+</p>
 
-> **Meta-skill that compiles installed skills into portable team skills.**
+<h1 align="center">Skill-Forge</h1>
 
-[![Release](https://img.shields.io/github/v/release/Codeenk/Skill-Forge?color=blue&logo=github)](https://github.com/Codeenk/Skill-Forge/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python: 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python)](https://www.python.org/)
-[![Spec: Agent Skills](https://img.shields.io/badge/Spec-agentskills.io-emerald)](https://agentskills.io)
-[![Zero Dependency](https://img.shields.io/badge/Dependencies-Stdlib%20Only-brightgreen)](#)
-[![Security: AST Audited](https://img.shields.io/badge/Security-AST%20Audited-green?logo=securityscorecard)](#)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Codeenk/Skill-Forge/pulls)
+<p align="center"><strong>Deterministic compiler & package manager for Agent Skills</strong><br/>Forge 325 installed skills into portable team skills — hermetic, audited, zero-dep.</p>
 
-Not an agent framework. Not generated Python agents. **Skill-Forge takes your already-installed `SKILL.md` files as raw material and emits one portable `SKILL.md` bundle** that orchestrates them through phased filesystem handoffs — runnable on any Agent Skills-compatible runtime (Claude Code, OpenCode, Cursor, Codex, Gemini CLI, Command Code, Goose, Amp, Roo Code, Kiro, TRAE, Copilot, Factory Droid, Windsurf, Junie, ...).
+<p align="center">
+<a href="https://github.com/Codeenk/Skill-Forge/releases"><img src="https://img.shields.io/github/v/release/Codeenk/Skill-Forge?color=blue&logo=github" alt="Release"/></a>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT"/></a>
+<a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.9%2B-blue?logo=python" alt="Python"/></a>
+<a href="https://agentskills.io"><img src="https://img.shields.io/badge/Spec-agentskills.io-emerald" alt="Spec"/></a>
+<img src="https://img.shields.io/badge/Dependencies-Stdlib%20Only-brightgreen" alt="Zero Dep"/>
+<img src="https://img.shields.io/badge/Security-AST%20Audited-green?logo=securityscorecard" alt="Security"/>
+<a href="https://github.com/Codeenk/Skill-Forge/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs"/></a>
+</p>
+
+<p align="center">
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#how-it-works--6-gates">How It Works</a> •
+  <a href="#enterprise-hardening">Enterprise</a> •
+  <a href="#examples">Examples</a>
+</p>
+
+> Not an agent framework. Not generated Python agents. **Skill-Forge takes your already-installed `SKILL.md` files as raw material and emits one portable `SKILL.md` bundle** that orchestrates them through phased filesystem handoffs — runnable on **any** Agent Skills-compatible runtime (Claude Code, OpenCode, Cursor, Codex, Gemini CLI, Antigravity, Goose, Amp, Roo, Kiro, TRAE, Copilot, Factory Droid, Windsurf, Junie, ...).
+
+<details><summary><strong>Table of Contents</strong></summary>
+
+- [Why Skill-Forge](#why-skill-forge)
+- [Quick Start](#quick-start)
+- [How It Works — 6 Gates](#how-it-works--6-gates)
+- [Generated Team Contract](#generated-team-contract)
+- [Layout](#layout)
+- [Examples](#examples)
+- [Enterprise Hardening](#enterprise-hardening)
+- [Development](#development)
+- [License](#license)
+
+</details>
 
 ---
 
