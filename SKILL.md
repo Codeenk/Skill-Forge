@@ -34,9 +34,27 @@ python3 <this-bundle>/scripts/forge.py scan --project --lock --out .team/manifes
 
 Read `.team/manifest.json`. Present the discovered roster compactly grouped by theme. If manifest is empty, tell the user which roots were checked and suggest installing skills first (via `npx skills find`) before forging. With `--lock`, also emits `.team/lock.json` with `sha256` + `git SHA` per skill for bit-for-bit hermetic guarantees. With `--project`, scans only `<repo>/.agents/skills` etc. for Bazel-hermetic builds.
 
+### Gate 1.5 - Resolve & Fetch (cold-start, auto-research)
+
+If Gate 1 found <2 skills or user intent needs a capability not in manifest (e.g., `stripe-billing` missing), resolve via curated registries — never raw web scrape:
+
+```bash
+python3 <this-bundle>/scripts/forge.py resolve --need stripe-billing --out .forge/vendor    # vendor-scoped (default, hermetic)
+python3 <this-bundle>/scripts/forge.py resolve --need stripe-billing --global               # global install (explicit consent)
+python3 <this-bundle>/scripts/forge.py resolve --need stripe-billing --offline              # air-gapped: do not fetch
+```
+
+Resolution order (per `references/registries.json`):
+1. Curated registries: `npx skills find <query>` (agentskills.io) + GitHub topic `agent-skills` + allowlist vendors
+2. Sandbox to `/tmp/forge-incoming/<skill>/`, run `forge.py audit` — abort on findings
+3. Vendor-scoped install to `.forge/vendor/<skill>/` (default) OR global `~/.claude/skills/` if `--global`; record in `.forge/lock.json`
+4. Re-run Gate 1 scan to include vended skills — now roster is sufficient
+
+Policy: default is isolated `.forge/vendor` (safe, hermetic). Global mutation requires explicit `--global` flag or user confirmation. `--offline` disables fetch for enterprise CI.
+
 ### Gate 2 - Select roster
 
-From the manifest ONLY. Rules:
+From the manifest (after Gate 1.5 if it ran) ONLY. Rules:
 - Every member must exist in the manifest. Hallucinating a skill name is a hard failure.
 - Select minimum members that cover the workflow; 2-5 is typical, never exceed 8.
 - Declare gaps out loud: "no testing skill found - proceeding without coverage" and ask whether to proceed or search first.

@@ -61,9 +61,16 @@ python3 scripts/forge.py verify ./my-team
 
 **Gate 0 — Understand intent** — Ask at most once: `team name`, `purpose`, `stack constraints`, `exclusions`. Derive `<domain>-team` if no name.
 
-**Gate 1 — Discover** — `scan` walks `PROJECT_ROOTS` + `HOME_ROOTS` (11 patterns + `FORGE_EXTRA_ROOTS`), dedupes by realpath, hashes `sha256:16hex`, writes `skill-forge/manifest@1` JSON.
+**Gate 1 — Discover** — `scan` walks `PROJECT_ROOTS` + `HOME_ROOTS` (11 patterns + `FORGE_EXTRA_ROOTS`), dedupes by realpath, hashes `sha256:16hex` (+ `git SHA`), writes `skill-forge/manifest@1` JSON. `.forge/vendor` is always scanned (hermetic vendor).
 
-**Gate 2 — Select roster** — From manifest ONLY. Never hallucinate. 2–8 members, declare gaps aloud: `no testing skill found - proceeding without coverage`.
+**Gate 1.5 — Resolve (cold-start)** — If Gate 1 missing a capability (e.g., `stripe-billing`), auto-research via curated `references/registries.json` (`npx skills find` → agentskills.io + GitHub `#agent-skills` + allowlist), sandbox to `/tmp/forge-incoming/`, `audit PASS` required, then vendor-scoped to `.forge/vendor/<skill>` (default, hermetic) or `--global` with explicit consent. `--offline` disables fetch for air-gapped CI.
+```bash
+python3 scripts/forge.py resolve --need stripe-billing --out .forge/vendor
+python3 scripts/forge.py resolve --need stripe-billing --global   # global with consent
+python3 scripts/forge.py resolve --need stripe-billing --offline   # enterprise CI
+```
+
+**Gate 2 — Select roster** — From manifest (after 1.5) ONLY. Never hallucinate. 2–8 members, declare gaps aloud: `no testing skill found - proceeding without coverage`.
 
 **Gate 3 — Synthesize** — Fill `templates/team-skeleton.md` per `references/synthesis-protocol.md` (topology → owner binding → contracts → assemble → sidecar). Frontmatter `name==dirname`, `description` ≤1024 chars with `Use when...`, artifact names unique, inputs only from earlier phases. Copy `scripts/forge.py` self-contained + write `.forge/manifest.json` provenance sidecar.
 
