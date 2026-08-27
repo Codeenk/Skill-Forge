@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Skill-Forge: The Deterministic Compiler & Package Manager for Agent Skills
+# Copyright (c) 2026 Codeenk
+# Licensed under the MIT License. See LICENSE in root for details.
+#
+# Zero-dependency Python standard library implementation (Python 3.9+).
+
 import argparse
 import datetime
 import hashlib

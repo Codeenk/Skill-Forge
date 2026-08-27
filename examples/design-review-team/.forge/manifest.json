@@ -1,0 +1,14 @@
+{
+  "schema": "skill-forge/sidecar@1",
+  "generator": "skill-forge",
+  "generated_at": "2026-08-27T00:00:00Z",
+  "source_workspace": "/home/grim/Documents/Idea1",
+  "roster": [
+    {
+      "skill": "huashu-design",
+      "path": "~/.agents/skills/huashu-design/SKILL.md",
+      "hash": "sha256:147db2e148bc77fa"
+    }
+  ],
+  "entry_points": ["SKILL.md"]
+}

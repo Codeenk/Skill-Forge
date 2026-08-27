@@ -2,9 +2,13 @@
 
 > **Meta-skill that compiles installed skills into portable team skills.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Python: 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](scripts/forge.py)
-[![Agent Skills Spec](https://img.shields.io/badge/spec-Agent%20Skills-green.svg)](https://github.com/anthropics/skills)
+[![Release](https://img.shields.io/github/v/release/Codeenk/Skill-Forge?color=blue&logo=github)](https://github.com/Codeenk/Skill-Forge/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python: 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python)](https://www.python.org/)
+[![Spec: Agent Skills](https://img.shields.io/badge/Spec-agentskills.io-emerald)](https://agentskills.io)
+[![Zero Dependency](https://img.shields.io/badge/Dependencies-Stdlib%20Only-brightgreen)](#)
+[![Security: AST Audited](https://img.shields.io/badge/Security-AST%20Audited-green?logo=securityscorecard)](#)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Codeenk/Skill-Forge/pulls)
 
 Not an agent framework. Not generated Python agents. **Skill-Forge takes your already-installed `SKILL.md` files as raw material and emits one portable `SKILL.md` bundle** that orchestrates them through phased filesystem handoffs — runnable on any Agent Skills-compatible runtime (Claude Code, OpenCode, Cursor, Codex, Gemini CLI, Command Code, Goose, Amp, Roo Code, Kiro, TRAE, Copilot, Factory Droid, Windsurf, Junie, ...).
 
@@ -120,18 +124,39 @@ Fallback: On missing inputs... produce best-effort, mark deviation...
 ## Layout
 
 ```
-skill-forge/
-├── SKILL.md                         # install this
+Skill-Forge/
+├── .github/
+│   └── workflows/
+│       ├── ci.yml                 # Headless forge eval + lint testing
+│       └── security-audit.yml     # forge.py audit runner
+├── .forge/
+│   └── manifest.json              # Sidecar manifest for skill-forge self-tracking
+├── examples/
+│   ├── design-review-team/        # Reference composite team
+│   │   ├── SKILL.md
+│   │   ├── .forge/manifest.json
+│   │   └── scripts/forge.py
+│   └── saas-dev-team/             # Reference fullstack squad
 ├── references/
-│   ├── synthesis-protocol.md        # Steps A-E: topology → bind → contracts → assemble
-│   ├── team-schema.md               # lint contract (frontmatter, body, phase, sidecar)
-│   └── runtime-paths.md             # 11 roots + detection policy
+│   ├── registries.json            # Curated registries for Gate 1.5 cold-start
+│   ├── runtime-paths.md           # 11 project & home runtime paths
+│   ├── synthesis-protocol.md      # Steps A-E: topology to contracts
+│   └── team-schema.md             # Spec, frontmatter, & lint rules
+├── scripts/
+│   └── forge.py                   # 590-line stdlib compiler (scan/resolve/lint/eval/install)
 ├── templates/
-│   ├── team-skeleton.md             # frontmatter + 5 operating rules + roster + phases
-│   └── phase-contract.md            # per-phase block template
-├── scripts/forge.py                 # scan | lint | install | verify (376 lines, stdlib only)
-└── examples/
-    └── design-review-team/          # golden reference compiled team
+│   ├── phase-contract.md          # Working dir, I/O, exit criteria template
+│   └── team-skeleton.md           # Master Jinja-style team template
+├── tests/
+│   ├── fixtures/                  # Mock payloads for headless CI
+│   └── test_compiler.py           # Unit tests for DAG loops, regex, & hashes
+├── .gitignore
+├── .gitattributes
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
+├── SECURITY.md
+└── SKILL.md                       # Root compiler skill (Gates 0-5 + 1.5)
 ```
 
 ---

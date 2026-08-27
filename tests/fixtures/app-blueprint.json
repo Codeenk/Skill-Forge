@@ -1,0 +1,6 @@
+{
+  "pages": [{"path": "/dashboard", "purpose": "main view"}],
+  "components": ["Header"],
+  "dataEntities": ["User"],
+  "apiNeeds": [{"endpoint": "/api/users", "method": "GET", "purpose": "list"}]
+}

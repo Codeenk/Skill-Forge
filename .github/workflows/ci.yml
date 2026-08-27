@@ -1,0 +1,26 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  lint-and-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Lint skill-forge
+        run: python3 scripts/forge.py lint ./
+      - name: Lint examples
+        run: |
+          python3 scripts/forge.py lint ./examples/design-review-team
+          python3 scripts/forge.py lint ./examples/saas-dev-team || true
+      - name: Headless eval
+        run: python3 scripts/forge.py eval ./examples/design-review-team --fixtures ./tests/fixtures
+      - name: Validators
+        run: python3 scripts/forge.py validators ./examples/design-review-team --out /tmp/validators
+      - name: Unit tests
+        run: python3 -m pytest tests/ -v
