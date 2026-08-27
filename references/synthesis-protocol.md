@@ -22,8 +22,9 @@ Cap: >8 members means you clustered wrong; regroup into fewer coarser phases.
 For each phase fill the template block. Quality bar for contracts:
 
 - Objective is verifiable: a reviewer could say yes/no it was met. Ban words like "good", "proper", "appropriate".
+- **Working directory is explicit**: default `project root` where `.team/artifacts/` lives; if the phase executes sub-skill sibling helpers (`./scripts/helper.sh`, `../references/rules.md`), set Working directory to the skill source dir (`~/path/to/skill`) and use absolute/home-relative paths to prevent ENOENT from relative assumptions.
 - Outputs specify SHAPE, e.g. `api-spec.json` with top-level keys `routes[], models[]`, or `copy.md` with sections `headline, body, ctas[3]`. Vague outputs are the #1 failure cause of composite skills.
-- Exit criterion must be mechanically checkable by reading the artifact: file exists + parses + contains required keys/sections.
+- Exit criterion must be mechanically checkable by reading the artifact: file exists + parses + contains required keys/sections. For high-stakes pipelines, plan lightweight JSON Schema validators for JSON outputs (see `forge.py validators`).
 - Fallback states behavior when the owner skill cannot be applied (missing stack info, contradicting instructions): default is "produce best-effort artifact, mark deviation in completion report".
 - Keep Actions to <=5 numbered steps; the owner skill supplies its own depth. You are choreographing, not rewriting.
 

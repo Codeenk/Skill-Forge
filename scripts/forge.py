@@ -11,6 +11,8 @@ NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 PHASE_RE = re.compile(r"^###\s+Phase\s+(\d+)\b")
 ARTIFACT_RE = re.compile(r"`(\.team/artifacts/[^`\s]+)`")
 READ_FIRST_RE = re.compile(r"Read first:\s*`([^`]+?)`")
+WORKING_DIR_RE = re.compile(r"Working directory:\s*`([^`]+)`")
+SHAPE_RE = re.compile(r"shape:\s*(.+)", re.I)
 
 PROJECT_ROOTS = [
     ".agents/skills",
@@ -233,6 +235,7 @@ def cmd_lint(args):
                 elif src >= ph:
                     errors.append(f"Phase {ph} consumes {a} produced by Phase {src} (forward/circular dependency)")
     owner_paths = READ_FIRST_RE.findall(body)
+    working_dirs = WORKING_DIR_RE.findall(body)
     if team_mode:
         for p in owner_paths:
             resolved = os.path.expanduser(p)
@@ -244,6 +247,15 @@ def cmd_lint(args):
                 warns.append(f"owner path does not exist on this machine: {p}")
         if len(owner_paths) < max(len(phase_nums) - 1, 1):
             warns.append("some phases lack an explicit 'Read first:' owner pointer")
+        if len(working_dirs) < len(phase_nums):
+            warns.append(f"only {len(working_dirs)}/{len(phase_nums)} phases declare Working directory — add explicit Working directory per phase-contract.md to avoid cwd ambiguity")
+        if "./scripts/" in body or "../references/" in body:
+            for ph in phase_nums:
+                block = body.split(f"### Phase {ph}:")[1].split("### Phase ")[0] if f"### Phase {ph}:" in body else ""
+                has_relative = "./scripts/" in block or "../references/" in block
+                has_skill_cwd = "skill" in block.lower() and "working directory" in block.lower()
+                if has_relative and not has_skill_cwd:
+                    warns.append(f"Phase {ph} references sibling scripts (./scripts/ or ../references/) but Working directory is not set to skill source dir — use absolute/home-relative paths")
         sidecar = os.path.join(d, ".forge", "manifest.json")
         if not os.path.isfile(sidecar):
             errors.append(".forge/manifest.json sidecar missing on generator-produced bundle")
@@ -263,6 +275,57 @@ def cmd_lint(args):
         print(f"lint: FAIL ({len(errors)} errors, {len(warns)} warnings)")
         return 1
     print(f"lint: PASS ({len(warns)} warnings)")
+    return 0
+
+
+def cmd_validators(args):
+    d = args.dir
+    out = os.path.expanduser(args.out)
+    skill_md = os.path.join(d, "SKILL.md")
+    if not os.path.isfile(skill_md):
+        print(f"validators: FAIL {skill_md} missing")
+        return 1
+    _, body = load_skill(skill_md)
+    os.makedirs(out, exist_ok=True)
+    generated = 0
+    for line in body.splitlines():
+        if "Outputs:" not in line or ".team/artifacts/" not in line:
+            continue
+        m_art = ARTIFACT_RE.search(line)
+        if not m_art:
+            continue
+        art = m_art.group(1)
+        if not art.endswith(".json"):
+            continue
+        m_shape = SHAPE_RE.search(line)
+        shape = m_shape.group(1) if m_shape else ""
+        keys = re.findall(r"([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:\[|\{|,)", shape)
+        keys = [k for k in keys if k not in {"JSON","json","keys","key","with","and","or","shape","top","level","sections"}]
+        seen = []
+        for k in keys:
+            if k not in seen:
+                seen.append(k)
+        keys = seen
+        if not keys:
+            keys = ["_placeholder"]
+        schema = {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "title": os.path.basename(art),
+            "type": "object",
+            "required": keys if keys != ["_placeholder"] else [],
+            "properties": {k: {} for k in keys if k != "_placeholder"},
+            "additionalProperties": True,
+        }
+        base = os.path.splitext(os.path.basename(art))[0]
+        out_path = os.path.join(out, f"{base}.schema.json")
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(schema, f, indent=2)
+        print(f"validator {base}.schema.json  required: {keys}")
+        generated += 1
+    if generated == 0:
+        print(f"validators: no JSON Outputs found in {skill_md} — nothing generated")
+        return 0
+    print(f"validators: {generated} schema(s) -> {out}")
     return 0
 
 
@@ -367,6 +430,11 @@ def main():
     v = sub.add_parser("verify", help="check roster drift via the bundle's sidecar")
     v.add_argument("dir")
     v.set_defaults(fn=cmd_verify)
+
+    gv = sub.add_parser("validators", help="generate lightweight JSON Schema validators from Outputs shapes")
+    gv.add_argument("dir", help="team bundle dir containing SKILL.md")
+    gv.add_argument("--out", default=".team/validators", help="output dir for *.schema.json (default: .team/validators)")
+    gv.set_defaults(fn=cmd_validators)
 
     args = ap.parse_args()
     sys.exit(args.fn(args))

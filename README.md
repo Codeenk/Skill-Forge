@@ -67,7 +67,9 @@ python3 scripts/forge.py verify ./my-team
 
 **Gate 3 — Synthesize** — Fill `templates/team-skeleton.md` per `references/synthesis-protocol.md` (topology → owner binding → contracts → assemble → sidecar). Frontmatter `name==dirname`, `description` ≤1024 chars with `Use when...`, artifact names unique, inputs only from earlier phases. Copy `scripts/forge.py` self-contained + write `.forge/manifest.json` provenance sidecar.
 
-**Gate 4 — Validate** — `lint` enforces `team-schema.md`: name regex, description triggers, allowed frontmatter only, phase numbering `1..N`, artifact dependency order, sidecar existence.
+**Gate 4 — Validate** — `lint` enforces `team-schema.md`: name regex, description triggers, allowed frontmatter only, phase numbering `1..N`, artifact dependency order, sidecar existence, **Working directory** declared per phase + sibling-script path lint.
+
+**Optional — Validators** — For high-stakes pipelines (payments, API routing, CI/CD): `python3 scripts/forge.py validators ./my-team --out .team/validators` generates lightweight JSON Schema files from each JSON `Outputs: ... - shape:` declaration for deterministic boundary checks.
 
 **Gate 5 — Install everywhere** — Mirrors bundle to every existing `*/skills` root (`--into` for explicit, `--force` to overwrite).
 
@@ -90,6 +92,7 @@ Phase block:
 ### Phase N: kebab-title
 Owner: `skill-name`
 Read first: `~/path/to/SKILL.md`
+Working directory: `project root` or `~/path/to/skill` (use skill dir for ./scripts/*)
 Objective: one verifiable sentence
 Inputs: `.team/artifacts/x.json` (Phase M) or `(none)`
 Actions: 1. Apply owner method... 2. Produce Outputs...

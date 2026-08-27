@@ -63,6 +63,7 @@ The sidecar is DATA for tools (`verify` consumes it). The SKILL.md body must sta
 ### Phase N: <kebab-case-title>
 Owner: `skill-name`
 Read first: `~/path/to/owner/SKILL.md`
+Working directory: `project root` or `~/path/to/skill` (default: project root; use skill dir when executing sibling scripts like `./scripts/helper.sh`)
 Objective: <one sentence>
 Inputs: <artifact paths or "(none)">
 Actions: <numbered instructions referencing the OWNER skill's method, not replacing it>
@@ -70,6 +71,8 @@ Outputs: `.team/artifacts/<name>.<ext>` - <shape: json keys | md sections | etc>
 Exit: <objectively checkable condition>
 Fallback: <what to do if owner skill cannot be followed>
 ```
+
+Optional for high-stakes pipelines: after synthesis, run `python3 <team-dir>/scripts/forge.py validators <team-dir>` to generate lightweight JSON Schema validators in `.team/validators/` from each `Outputs: ... - shape:` declaration. Validate artifacts at phase boundaries.
 
 Rules enforced by lint:
 - Phase numbers start at 1 and increase by 1.

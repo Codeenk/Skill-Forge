@@ -45,7 +45,7 @@ From the manifest ONLY. Rules:
 Fill [templates/team-skeleton.md](templates/team-skeleton.md) following the full procedure in [references/synthesis-protocol.md](references/synthesis-protocol.md). Contract format rules are in [references/team-schema.md](references/team-schema.md). Key constraints:
 
 - Frontmatter: name matches directory name; description ≤1024 chars written in trigger-rich form ("...Use when the user wants...").
-- One `### Phase N:` block per stage using [templates/phase-contract.md](templates/phase-contract.md): each has Owner, Read-first path, Objective, Inputs, Actions, Outputs (artifact path + expected shape), Exit criteria, Failure fallback.
+- One `### Phase N:` block per stage using [templates/phase-contract.md](templates/phase-contract.md): each has Owner, Read-first path, Working directory, Objective, Inputs, Actions, Outputs (artifact path + expected shape), Exit criteria, Failure fallback.
 - Artifact filenames must be unique across all phases' Outputs lines.
 - Phases must form a valid sequence (numbered from 1, no forward input dependencies).
 - Roster paths are home-relative (`~/...`) when under the user's home directory.
@@ -59,6 +59,14 @@ python3 <new-bundle>/scripts/forge.py lint <new-bundle-dir>
 ```
 
 Fix ALL errors and rerun until PASS. Also verify manually that the body reads cleanly end-to-end before declaring success.
+
+**Optional for high-stakes pipelines** (financial math, API routing, CI/CD migrations): generate machine validators from Exit shapes:
+
+```bash
+python3 <new-bundle>/scripts/forge.py validators <new-bundle-dir> --out .team/validators
+```
+
+This emits lightweight JSON Schema files in `.team/validators/<artifact>.schema.json` for every JSON `Outputs:` declaration, so phase boundaries are enforced deterministically. Keeps casual teams lightweight (Markdown-only) while hardening mission-critical ones.
 
 ### Gate 5 - Install everywhere
 
